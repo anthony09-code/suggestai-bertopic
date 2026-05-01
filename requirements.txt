@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+bertopic
+pandas
+numpy
+pydantic
+diskcache
+python-dotenv
