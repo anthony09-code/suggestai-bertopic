@@ -1,6 +1,6 @@
-from api.routes import router
 from fastapi import FastAPI
 
-app = FastAPI(title="BERTopic Service")
+from app.api.routes import router
 
-app.include_router(router)
+app = FastAPI(title="BERTopic Service")
+app.include_router(router, prefix="/api")

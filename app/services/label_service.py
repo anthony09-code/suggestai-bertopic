@@ -1,7 +1,8 @@
 import requests
-from core.config import settings
-from prompts.topic_label_prompt import topic_label_prompt
-from services.cache_service import cache_service
+
+from app.core.config import settings
+from app.prompts.topic_label_prompt import topic_label_prompt
+from app.services.cache_service import cache_service
 
 
 class LabelService:
