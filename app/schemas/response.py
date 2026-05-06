@@ -1,7 +1,8 @@
 from typing import List
 
 from pydantic import BaseModel
-from schemas.topic import TopicSchema
+
+from app.schemas.topic import TopicSchema
 
 
 class TopicResponse(BaseModel):
