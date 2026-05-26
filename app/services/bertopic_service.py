@@ -3,13 +3,13 @@ import json
 import logging
 from collections import defaultdict
 
-from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 
 from app.services.cache_service import cache_service
 from app.services.label_service import LabelService
 from app.utils.stopwords import get_combined_stopwords
+from bertopic import BERTopic
 
 logger = logging.getLogger(__name__)
 
@@ -116,6 +116,18 @@ class BertopicService:
 
         result = {
             "topics": results,
+            "results": [
+                {
+                    "topic_id": topic_id,
+                    "cleaned_text": doc,
+                    "translated_text": None,
+                    "summary": None,
+                    "confidence_score": float(probs[i])
+                    if probs is not None and i < len(probs)
+                    else 0.0,
+                }
+                for i, (doc, topic_id) in enumerate(zip(documents, topics))
+            ],
             "message": f"Successfully analyzed {len(documents)} documents for office {office_id}",
         }
 
