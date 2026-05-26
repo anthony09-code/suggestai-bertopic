@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 bertopic
+keybert
 sentence-transformers
 scikit-learn
 pandas
