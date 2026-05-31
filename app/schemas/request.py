@@ -6,6 +6,7 @@ from pydantic import BaseModel, field_validator
 class FeedbackRequest(BaseModel):
     office_id: str
     documents: List[str]
+    feedback_ids: List[str]
 
     @field_validator("office_id")
     @classmethod

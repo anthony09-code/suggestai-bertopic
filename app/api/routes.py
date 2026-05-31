@@ -15,7 +15,9 @@ bertopic_service = BertopicService()
 async def analyze_feedback(request: FeedbackRequest):
     try:
         result = bertopic_service.fit_topics(
-            office_id=request.office_id, documents=request.documents
+            office_id=request.office_id,
+            documents=request.documents,
+            feedback_ids=request.feedback_ids,
         )
         return result
 
