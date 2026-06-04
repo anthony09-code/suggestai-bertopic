@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 # Matches any label that looks like the model leaked reasoning
 _REASONING_LEAK = re.compile(
-    r"(\n|because|keyword|cluster|label|phrase|topic)", re.IGNORECASE
+    r"(\n|because\s|this\s+keyword|this\s+cluster|the\s+label|the\s+phrase|the\s+topic\s+is)",
+    re.IGNORECASE,
 )
 
 
