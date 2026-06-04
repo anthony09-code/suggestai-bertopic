@@ -3,8 +3,10 @@ import json
 import logging
 from collections import defaultdict
 
+from hdbscan import HDBSCAN
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import CountVectorizer
+from umap import UMAP
 
 from app.services.cache_service import cache_service
 from app.services.label_service import LabelService
@@ -18,19 +20,42 @@ logger = logging.getLogger(__name__)
 class BertopicService:
     def __init__(self):
         try:
-            self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+            self.embedding_model = SentenceTransformer(
+                "paraphrase-multilingual-MiniLM-L12-v2"
+            )
+
+            umap_model = UMAP(
+                n_neighbors=15,
+                n_components=5,
+                min_dist=0.0,
+                metric="cosine",
+                random_state=42,
+            )
+
+            hdbscan_model = HDBSCAN(
+                min_cluster_size=5,
+                min_samples=2,
+                metric="euclidean",
+                cluster_selection_method="eom",
+                prediction_data=True,
+            )
 
             vectorizer = CountVectorizer(
                 stop_words=get_combined_stopwords(),
                 token_pattern=r"(?u)\b[a-zA-Z]\w{2,}\b",
                 min_df=2,
+                ngram_range=(1, 2),
             )
 
             self.model = BERTopic(
                 embedding_model=self.embedding_model,
+                umap_model=umap_model,
+                hdbscan_model=hdbscan_model,
                 vectorizer_model=vectorizer,
-                min_topic_size=10,
+                min_topic_size=5,
+                nr_topics="auto",
                 verbose=True,
+                calculate_probabilities=True,
             )
 
             self.label_service = LabelService()
@@ -43,7 +68,7 @@ class BertopicService:
         self, office_id: str, documents: list[str], feedback_ids: list[str]
     ) -> str:
         content = (
-            "v3" + office_id + json.dumps(sorted(documents)) + json.dumps(feedback_ids)
+            "v4" + office_id + json.dumps(sorted(documents)) + json.dumps(feedback_ids)
         )
         return "topics_" + hashlib.md5(content.encode()).hexdigest()
 
@@ -97,6 +122,9 @@ class BertopicService:
 
         try:
             topics, probs = self.model.fit_transform(cleaned_docs)
+            topics = self.model.reduce_outliers(
+                cleaned_docs, topics, strategy="probabilities"
+            )
         except Exception as e:
             logger.error(f"BERTopic fit_transform failed: {e}")
             raise RuntimeError("Topic modeling failed. Please try again.")
